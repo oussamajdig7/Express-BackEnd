@@ -22,7 +22,13 @@ export const getProduits = (async (req: Request, res: Response) => {
                 name: true,
                 description: true,
                 price: true,
-                categorie: true,
+                categorie : {
+                    select : {
+                        id: true,
+                        name: true,
+                        coleur: true,
+                    }
+                }
             }}
         ); 
         res.json(produits);

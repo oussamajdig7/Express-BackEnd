@@ -1,6 +1,28 @@
 import { prisma } from '../lib/prisma.js';
 import type { Request, Response } from "express";
 import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
+import process from 'process';
+import dotenv from 'dotenv';
+dotenv.config();
+
+export const auth = async (req:Request,res:Response)=>{
+    const {email,password}=req.body
+    const user=await prisma.vendeur.findUnique({
+        where:{  email  }
+    })
+    if(!user){
+        return res.status(404).json({"message":"email non valide"})
+    }
+    const ispassword=await bcrypt.compare(password,user.password);
+    if(!ispassword){
+        return res.status(401).json({"message":"password non valide"})
+    }
+    const token=jwt.sign({user:user},process.env.JWT_CLE as string,{
+        expiresIn:"1h"
+    })
+    return res.status(200).json({"message":"user connecter",'_token':token})
+}
 
 export const createVendeurs = (async (req: Request, res: Response) => {
     const { name, email, password } = req.body;
@@ -23,6 +45,8 @@ export const getVendeurs = (async (req: Request, res: Response) => {
                     id: true,
                     name: true,
                     email: true,
+                    password: true,
+                    createdAt: true,
                 }
             }
         );

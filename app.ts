@@ -1,7 +1,5 @@
 import express from "express";
 import type { Request, Response } from "express";
-import {prisma} from "./lib/prisma.js";
-import bcrypt from "bcrypt";
 import router from "./routes/web.js";
 
 const app = express();

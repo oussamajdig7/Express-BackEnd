@@ -18,6 +18,8 @@ model Categorie {
   name String
   coleur String
   produits Produit[]
+  createdAt DateTime @default(now())
+  // updatedAt DateTime @updatedAt
 }
 
 model Produit {
@@ -25,8 +27,11 @@ model Produit {
   name String
   description String
   price Float
-  categorie Categorie @relation(fields: [IdCategorie], references: [id])
   IdCategorie Int 
+  ventes Vente[]
+  categorie Categorie @relation(fields: [IdCategorie], references: [id])
+  createdAt DateTime @default(now())
+  // updatedAt DateTime @updatedAt
 }
 
 model Vendeur {
@@ -34,6 +39,33 @@ model Vendeur {
   name String
   email String @unique
   password String
+  clients Client[]
+  createdAt DateTime @default(now())
+  // updatedAt DateTime @updatedAt
 }
+
+model Client {
+  id Int @id @default(autoincrement())
+  name String
+  prenom String
+  idVendeur Int
+  ventes Vente[]
+  vendeur Vendeur @relation(fields: [idVendeur], references: [id])
+  createdAt DateTime @default(now())
+  // updatedAt DateTime @updatedAt
+}
+
+model Vente {
+  id Int @id @default(autoincrement())
+  idProduit Int
+  idClient Int
+  Qte Int
+  CordonnéGPS String
+  produit Produit @relation(fields: [idProduit], references: [id])
+  client Client @relation(fields: [idClient], references: [id])
+  createdAt DateTime @default(now())
+  // updatedAt DateTime @updatedAt
+  }
+
 
 
