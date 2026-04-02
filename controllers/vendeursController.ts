@@ -18,15 +18,29 @@ export const auth = async (req:Request,res:Response)=>{
     if(!ispassword){
         return res.status(401).json({"message":"password non valide"})
     }
-    const token=jwt.sign({user:user},process.env.JWT_CLE as string,{
-        expiresIn:"1h"
-    })
-    return res.status(200).json({"message":"user connecter",'_token':token})
+    const token = jwt.sign(
+  { id: user.id, email: user.email },
+  process.env.JWT_CLE as string,
+  { expiresIn: "1h" }
+);
+
+return res.status(200).json({
+  message: "user connecter",
+  token: token 
+});
 }
 
-export const createVendeurs = (async (req: Request, res: Response) => {
+export const createVendeurs = async (req: Request, res: Response) => {
     const { name, email, password } = req.body;
+
+    // 1️⃣ check ila email kayn
+    const existingUser = await prisma.vendeur.findUnique({ where: { email } });
+    if (existingUser) {
+        return res.status(400).json({ message: "Email deja utilise" });
+    }
+
     const hashedPassword = await bcrypt.hash(password, 10);
+
     const data = await prisma.vendeur.create({
         data: {
             name,
@@ -34,8 +48,9 @@ export const createVendeurs = (async (req: Request, res: Response) => {
             password: hashedPassword
         },
     });
-    res.json(data);
-});
+
+    res.status(201).json({ message: "User cree avec succes", data });
+};
 
 export const getVendeurs = (async (req: Request, res: Response) => {
     try {

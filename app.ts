@@ -1,25 +1,22 @@
 import express from "express";
+import cors from "cors";
 import type { Request, Response } from "express";
-import path from "path";
-// import router from "./routes/web.js";
-import webRoutes from "./routes/web.js";
+import router from "./routes/web.js";
 
 const app = express();
 app.use(express.json());
 
-app.use(express.static(path.join(process.cwd(), "frontend")));
-
-app.get("/login", (req: Request, res: Response) => {
-    res.sendFile(path.join(process.cwd(), "frontend", "index.html"));
-});
-
-// app.use('/',router);
-app.use("/", webRoutes);
+app.use(cors({
+  origin: "http://localhost:5173", 
+  credentials: true
+}));
 
 // ------------------- Running API route ------------------
 app.get("/", (req: Request, res: Response) => {
     res.send("API is running 🚀");
 });
+app.use('/',router);
+
 
 // ---------------- Start the server ----------------
 app.listen(5000, () => {
